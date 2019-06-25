@@ -20,7 +20,11 @@ public extension UIView {
         showSkeleton(withType: .gradient, usingColors: gradient.colors, animated: true, animation: animation)
     }
     
-    func hideSkeleton(reloadDataAfter reload: Bool = true) {
+    @objc func showAnimatedHorizontalGradientSkeleton() {
+        showSkeleton(withType: .gradient, usingColors: SkeletonAppearance.default.gradient.colors, animated: true, animation: nil)
+    }
+    
+    @objc func hideSkeleton(reloadDataAfter reload: Bool = true) {
         flowDelegate?.willBeginHidingSkeletons(withRootView: self)
         recursiveHideSkeleton(reloadDataAfter: reload, root: self)
     }
