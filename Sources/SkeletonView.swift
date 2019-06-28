@@ -72,8 +72,6 @@ extension UIView {
     }
     
     fileprivate func recursiveHideSkeleton(reloadDataAfter reload: Bool, root: UIView? = nil) {
-        removeDummyDataSourceIfNeeded(reloadAfter: reload)
-        isUserInteractionEnabled = true
         subviewsSkeletonables.recursiveSearch(leafBlock: {
             recoverViewState(forced: false)
             removeSkeletonLayer()
@@ -83,6 +81,8 @@ extension UIView {
         if let root = root {
             flowDelegate?.didHideSkeletons(withRootView: root)
         }
+        isUserInteractionEnabled = true
+        removeDummyDataSourceIfNeeded(reloadAfter: reload)
     }
     
     fileprivate func startSkeletonLayerAnimationBlock(_ anim: SkeletonLayerAnimation? = nil) -> VoidBlock {
