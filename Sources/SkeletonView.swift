@@ -4,6 +4,15 @@ import UIKit
 
 public extension UIView {
     
+    @objc func showAnimatedHorizontalGradientSkeleton() {
+        showSkeleton(withType: .gradient, usingColors: SkeletonAppearance.default.gradient.colors, animated: true, animation: nil)
+    }
+    
+    @objc func hideSkeleton(reloadDataAfter reload: Bool = true) {
+        flowDelegate?.willBeginHidingSkeletons(withRootView: self)
+        recursiveHideSkeleton(reloadDataAfter: reload, root: self)
+    }
+    
     func showSkeleton(usingColor color: UIColor = SkeletonAppearance.default.tintColor) {
         showSkeleton(withType: .solid, usingColors: [color])
     }
@@ -18,15 +27,6 @@ public extension UIView {
     
     func showAnimatedGradientSkeleton(usingGradient gradient: SkeletonGradient = SkeletonAppearance.default.gradient, animation: SkeletonLayerAnimation? = nil) {
         showSkeleton(withType: .gradient, usingColors: gradient.colors, animated: true, animation: animation)
-    }
-    
-    @objc func showAnimatedHorizontalGradientSkeleton() {
-        showSkeleton(withType: .gradient, usingColors: SkeletonAppearance.default.gradient.colors, animated: true, animation: nil)
-    }
-    
-    @objc func hideSkeleton(reloadDataAfter reload: Bool = true) {
-        flowDelegate?.willBeginHidingSkeletons(withRootView: self)
-        recursiveHideSkeleton(reloadDataAfter: reload, root: self)
     }
     
     func startSkeletonAnimation(_ anim: SkeletonLayerAnimation? = nil) {
