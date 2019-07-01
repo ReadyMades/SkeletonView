@@ -4,6 +4,15 @@ import UIKit
 
 public extension UIView {
     
+    @objc func showAnimatedHorizontalGradientSkeleton() {
+        showSkeleton(withType: .gradient, usingColors: SkeletonAppearance.default.gradient.colors, animated: true, animation: nil)
+    }
+    
+    @objc func hideSkeleton(reloadDataAfter reload: Bool = true) {
+        flowDelegate?.willBeginHidingSkeletons(withRootView: self)
+        recursiveHideSkeleton(reloadDataAfter: reload, root: self)
+    }
+    
     func showSkeleton(usingColor color: UIColor = SkeletonAppearance.default.tintColor) {
         showSkeleton(withType: .solid, usingColors: [color])
     }
@@ -18,11 +27,6 @@ public extension UIView {
     
     func showAnimatedGradientSkeleton(usingGradient gradient: SkeletonGradient = SkeletonAppearance.default.gradient, animation: SkeletonLayerAnimation? = nil) {
         showSkeleton(withType: .gradient, usingColors: gradient.colors, animated: true, animation: animation)
-    }
-    
-    func hideSkeleton(reloadDataAfter reload: Bool = true) {
-        flowDelegate?.willBeginHidingSkeletons(withRootView: self)
-        recursiveHideSkeleton(reloadDataAfter: reload, root: self)
     }
     
     func startSkeletonAnimation(_ anim: SkeletonLayerAnimation? = nil) {
@@ -68,8 +72,6 @@ extension UIView {
     }
     
     fileprivate func recursiveHideSkeleton(reloadDataAfter reload: Bool, root: UIView? = nil) {
-        removeDummyDataSourceIfNeeded(reloadAfter: reload)
-        isUserInteractionEnabled = true
         subviewsSkeletonables.recursiveSearch(leafBlock: {
             recoverViewState(forced: false)
             removeSkeletonLayer()
@@ -79,6 +81,8 @@ extension UIView {
         if let root = root {
             flowDelegate?.didHideSkeletons(withRootView: root)
         }
+        isUserInteractionEnabled = true
+        removeDummyDataSourceIfNeeded(reloadAfter: reload)
     }
     
     fileprivate func startSkeletonLayerAnimationBlock(_ anim: SkeletonLayerAnimation? = nil) -> VoidBlock {

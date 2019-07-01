@@ -8,10 +8,10 @@
 
 import UIKit
 
-public protocol SkeletonTableViewDataSource: UITableViewDataSource {
-    func numSections(in collectionSkeletonView: UITableView) -> Int
-    func collectionSkeletonView(_ skeletonView: UITableView, numberOfRowsInSection section: Int) -> Int
-    func collectionSkeletonView(_ skeletonView: UITableView, cellIdentifierForRowAt indexPath: IndexPath) -> ReusableCellIdentifier
+@objc public protocol SkeletonTableViewDataSource: UITableViewDataSource {
+    @objc optional func numSections(in collectionSkeletonView: UITableView) -> Int
+    @objc optional func collectionSkeletonView(_ skeletonView: UITableView, numberOfRowsInSection section: Int) -> Int
+    @objc func collectionSkeletonView(_ skeletonView: UITableView, cellIdentifierForRowAt indexPath: IndexPath) -> ReusableCellIdentifier
 }
 
 public extension SkeletonTableViewDataSource {
