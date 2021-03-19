@@ -4,7 +4,6 @@ import UIKit
 import SkeletonView
 
 class ViewController: UIViewController {
-    
     @IBOutlet weak var collectionView: UICollectionView! {
         didSet {
             collectionView.isSkeletonable = true
@@ -36,6 +35,9 @@ class ViewController: UIViewController {
     
     @IBOutlet weak var switchAnimated: UISwitch!
     @IBOutlet weak var skeletonTypeSelector: UISegmentedControl!
+    @IBOutlet weak var showOrHideSkeletonButton: UIButton!
+    @IBOutlet weak var transitionDurationLabel: UILabel!
+    @IBOutlet weak var transitionDurationStepper: UIStepper!
     
     var type: SkeletonType {
         return skeletonTypeSelector.selectedSegmentIndex == 0 ? .solid : .gradient
@@ -43,7 +45,7 @@ class ViewController: UIViewController {
     
     override func viewDidLoad() {
         super.viewDidLoad()
-        view.isSkeletonable = true
+        transitionDurationStepper.value = 0.25
         collectionView.prepareSkeleton(completion: { done in
             self.view.showAnimatedSkeleton()
         })
@@ -65,6 +67,23 @@ class ViewController: UIViewController {
         showAlertPicker()
     }
     
+    @IBAction func showOrHideSkeleton(_ sender: Any) {
+        showOrHideSkeletonButton.setTitle((view.isSkeletonActive ? "Show skeleton" : "Hide skeleton"), for: .normal)
+        view.isSkeletonActive ? hideSkeleton() : showSkeleton()
+    }
+    
+    @IBAction func transitionDurationStepperAction(_ sender: Any) {
+        transitionDurationLabel.text = "transition duration: \(transitionDurationStepper.value) sec"
+    }
+    
+    func showSkeleton() {
+        refreshSkeleton()
+    }
+    
+    func hideSkeleton() {
+        view.hideSkeleton(transition: .crossDissolve(transitionDurationStepper.value))
+    }
+    
     func refreshSkeleton() {
         self.view.hideSkeleton()
         if type == .gradient { showGradientSkeleton() }
@@ -73,23 +92,22 @@ class ViewController: UIViewController {
     
     func showSolidSkeleton() {
         if switchAnimated.isOn {
-            view.showAnimatedSkeleton(usingColor: colorSelectedView.backgroundColor!)
+            view.showAnimatedSkeleton(usingColor: colorSelectedView.backgroundColor!, transition: .crossDissolve(transitionDurationStepper.value))
         } else {
-            view.showSkeleton(usingColor: colorSelectedView.backgroundColor!)
+            view.showSkeleton(usingColor: colorSelectedView.backgroundColor!, transition: .crossDissolve(transitionDurationStepper.value))
         }
     }
     
     func showGradientSkeleton() {
         let gradient = SkeletonGradient(baseColor: colorSelectedView.backgroundColor!)
         if switchAnimated.isOn {
-            view.showAnimatedGradientSkeleton(usingGradient: gradient)
+            view.showAnimatedGradientSkeleton(usingGradient: gradient, transition: .crossDissolve(transitionDurationStepper.value))
         } else {
-            view.showGradientSkeleton(usingGradient: gradient)
+            view.showGradientSkeleton(usingGradient: gradient, transition: .crossDissolve(transitionDurationStepper.value))
         }
     }
     
     func showAlertPicker() {
-        
         let alertView = UIAlertController(title: "Select color", message: "\n\n\n\n\n\n", preferredStyle: .alert)
         
         let pickerView = UIPickerView(frame: CGRect(x: 0, y: 50, width: 260, height: 115))
@@ -117,7 +135,6 @@ class ViewController: UIViewController {
  // MARK: - UIPickerViewDelegate, UIPickerViewDataSource
 
  extension ViewController: UIPickerViewDelegate, UIPickerViewDataSource {
-    
     func numberOfComponents(in pickerView: UIPickerView) -> Int {
         return 1
     }
@@ -134,7 +151,6 @@ class ViewController: UIViewController {
 // MARK: - UICollectionViewDelegateFlowLayout
 
 extension ViewController: UICollectionViewDelegateFlowLayout {
-    
     func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, sizeForItemAt indexPath: IndexPath) -> CGSize {
         return CGSize(width: view.frame.width/3 - 10, height: view.frame.width/3 - 10)
     }
@@ -162,7 +178,7 @@ extension ViewController: SkeletonCollectionViewDataSource {
     // MARK: - UICollectionViewDataSource
     
     func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
-        return 0
+        return 10
     }
     
     func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {

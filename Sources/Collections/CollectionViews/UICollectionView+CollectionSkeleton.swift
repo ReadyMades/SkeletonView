@@ -9,10 +9,9 @@
 import UIKit
 
 extension UICollectionView: CollectionSkeleton {
-    
     var estimatedNumberOfRows: Int {
         guard let flowlayout = collectionViewLayout as? UICollectionViewFlowLayout else { return 0 }
-        return Int(ceil(frame.height/flowlayout.itemSize.height))
+        return Int(ceil(frame.height / flowlayout.itemSize.height))
     }
     
     var skeletonDataSource: SkeletonCollectionDataSource? {
@@ -41,6 +40,14 @@ extension UICollectionView: CollectionSkeleton {
         reloadData()
     }
     
+    func updateDummyDataSource() {
+        if (dataSource as? SkeletonCollectionDataSource) != nil {
+            reloadData()
+        } else {
+            addDummyDataSource()
+        }
+    }
+    
     func removeDummyDataSource(reloadAfter: Bool) {
         guard let dataSource = self.dataSource as? SkeletonCollectionDataSource else { return }
         self.skeletonDataSource = nil
@@ -63,7 +70,7 @@ public extension UICollectionView {
         self.skeletonDataSource = dataSource
         performBatchUpdates({
             self.reloadData()
-        }) { (done) in
+        }) { done in
             completion(done)
             
         }
