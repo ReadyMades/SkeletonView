@@ -3,12 +3,11 @@
 import Foundation
 
 extension Int {
-    
     var whitespace: String {
-        return whitespaces
+        whitespaces
     }
     
     var whitespaces: String {
-        return String(repeating: " ", count: self)
+        String(repeating: " ", count: self)
     }
 }

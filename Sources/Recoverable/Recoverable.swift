@@ -9,13 +9,11 @@
 import UIKit
 
 protocol Recoverable {
-    var viewState: RecoverableViewState? { get set }
     func saveViewState()
     func recoverViewState(forced: Bool)
 }
 
 extension UIView: Recoverable {
-
     var viewState: RecoverableViewState? {
         get { return ao_get(pkey: &ViewAssociatedKeys.viewState) as? RecoverableViewState }
         set { ao_setOptional(newValue, pkey: &ViewAssociatedKeys.viewState) }
@@ -26,49 +24,131 @@ extension UIView: Recoverable {
     }
     
     @objc func recoverViewState(forced: Bool) {
-        guard let safeViewState = viewState else { return }
+        guard let storedViewState = viewState else { return }
         
-        layer.cornerRadius = safeViewState.cornerRadius
-        layer.masksToBounds = safeViewState.clipToBounds
-        
-        if safeViewState.backgroundColor != backgroundColor || forced {
-            backgroundColor = safeViewState.backgroundColor
+        startTransition { [weak self] in
+            self?.layer.cornerRadius = storedViewState.cornerRadius
+            self?.layer.masksToBounds = storedViewState.clipToBounds
+            self?.isUserInteractionEnabled = storedViewState.isUserInteractionsEnabled
+            
+            if self?.backgroundColor == .clear || forced {
+                self?.backgroundColor = storedViewState.backgroundColor
+            }
         }
     }
 }
 
 extension UILabel {
+    var labelState: RecoverableTextViewState? {
+        get { return ao_get(pkey: &ViewAssociatedKeys.labelViewState) as? RecoverableTextViewState }
+        set { ao_setOptional(newValue, pkey: &ViewAssociatedKeys.labelViewState) }
+    }
+    
     override func saveViewState() {
         super.saveViewState()
-        viewState?.text = text
+        labelState = RecoverableTextViewState(view: self)
     }
     
     override func recoverViewState(forced: Bool) {
         super.recoverViewState(forced: forced)
-        text = text == " " || forced ? viewState?.text : text
+        startTransition { [weak self] in
+            guard let storedLabelState = self?.labelState else { return }
+            
+            self?.restoreBackupHeightConstraints()
+            
+            if self?.textColor == .clear || forced {
+                self?.textColor = storedLabelState.textColor
+            }
+        }
     }
 }
 
 extension UITextView {
+    var textState: RecoverableTextViewState? {
+        get { return ao_get(pkey: &ViewAssociatedKeys.labelViewState) as? RecoverableTextViewState }
+        set { ao_setOptional(newValue, pkey: &ViewAssociatedKeys.labelViewState) }
+    }
+    
     override func saveViewState() {
         super.saveViewState()
-        viewState?.text = text
+        textState = RecoverableTextViewState(view: self)
     }
     
     override func recoverViewState(forced: Bool) {
         super.recoverViewState(forced: forced)
-        text = text == " " || forced ? viewState?.text : text
+        startTransition { [weak self] in
+            guard let storedLabelState = self?.textState else { return }
+            
+            if self?.textColor == .clear || forced {
+                self?.textColor = storedLabelState.textColor
+            }
+        }
+    }
+}
+
+extension UITextField {
+    var textState: RecoverableTextFieldState? {
+        get { return ao_get(pkey: &ViewAssociatedKeys.labelViewState) as? RecoverableTextFieldState }
+        set { ao_setOptional(newValue, pkey: &ViewAssociatedKeys.labelViewState) }
+    }
+
+    override func saveViewState() {
+        super.saveViewState()
+        textState = RecoverableTextFieldState(view: self)
+    }
+
+    override func recoverViewState(forced: Bool) {
+        super.recoverViewState(forced: forced)
+        startTransition { [weak self] in
+            guard let storedLabelState = self?.textState else { return }
+
+            if self?.textColor == .clear || forced {
+                self?.textColor = storedLabelState.textColor
+            }
+
+            if self?.placeholder == nil || forced {
+                self?.placeholder = storedLabelState.placeholder
+            }
+        }
     }
 }
 
 extension UIImageView {
+    var imageState: RecoverableImageViewState? {
+        get { return ao_get(pkey: &ViewAssociatedKeys.imageViewState) as? RecoverableImageViewState }
+        set { ao_setOptional(newValue, pkey: &ViewAssociatedKeys.imageViewState) }
+    }
+    
     override func saveViewState() {
         super.saveViewState()
-        viewState?.image = image
+        imageState = RecoverableImageViewState(view: self)
     }
     
     override func recoverViewState(forced: Bool) {
         super.recoverViewState(forced: forced)
-        image = image == nil || forced ? viewState?.image : image
+        startTransition { [weak self] in
+            self?.image = self?.image == nil || forced ? self?.imageState?.image : self?.image
+        }
+    }
+}
+
+extension UIButton {
+    var buttonState: RecoverableButtonViewState? {
+        get { return ao_get(pkey: &ViewAssociatedKeys.buttonViewState) as? RecoverableButtonViewState }
+        set { ao_setOptional(newValue, pkey: &ViewAssociatedKeys.buttonViewState) }
+    }
+    
+    override func saveViewState() {
+        super.saveViewState()
+        buttonState = RecoverableButtonViewState(view: self)
+    }
+    
+    override func recoverViewState(forced: Bool) {
+        super.recoverViewState(forced: forced)
+        startTransition { [weak self] in
+            if self?.title(for: .normal) == nil {
+                self?.setTitle(self?.buttonState?.title, for: .normal)
+            }
+        }
     }
 }

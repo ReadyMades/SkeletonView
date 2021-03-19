@@ -2,7 +2,7 @@
 
 import Foundation
 
-//Partially copy/pasted from https://github.com/jameslintaylor/AssociatedObjects/blob/master/AssociatedObjects/AssociatedObjects.swift
+// Partially copy/pasted from https://github.com/jameslintaylor/AssociatedObjects/blob/master/AssociatedObjects/AssociatedObjects.swift
 enum AssociationPolicy: UInt {
     // raw values map to objc_AssociationPolicy's raw values
     case assign = 0
@@ -12,15 +12,15 @@ enum AssociationPolicy: UInt {
     case retainNonatomic = 1
     
     var objc: objc_AssociationPolicy {
+        // swiftlint:disable:next force_unwrapping
         return objc_AssociationPolicy(rawValue: rawValue)!
     }
 }
 
-protocol AssociatedObjects: class { }
+protocol AssociatedObjects: AnyObject { }
 
 // transparent wrappers
 extension AssociatedObjects {
-
     /// wrapper around `objc_getAssociatedObject`
     func ao_get(pkey: UnsafeRawPointer) -> Any? {
         return objc_getAssociatedObject(self, pkey)

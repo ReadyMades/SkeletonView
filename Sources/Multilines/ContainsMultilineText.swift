@@ -5,14 +5,16 @@ import UIKit
 enum MultilineAssociatedKeys {
     static var lastLineFillingPercent = "lastLineFillingPercent"
     static var multilineCornerRadius = "multilineCornerRadius"
+    static var multilineSpacing = "multilineSpacing"
+    static var paddingInsets = "paddingInsets"
+    static var backupHeightConstraints = "backupHeightConstraints"
 }
 
 protocol ContainsMultilineText {
+    var constraintHeight: CGFloat? { get }
     var numLines: Int { get }
     var lastLineFillingPercent: Int { get }
     var multilineCornerRadius: Int { get }
-}
-
-extension ContainsMultilineText {
-    var numLines: Int { return 0 }
+    var multilineSpacing: CGFloat { get }
+    var paddingInsets: UIEdgeInsets { get }
 }
